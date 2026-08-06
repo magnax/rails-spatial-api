@@ -1,0 +1,20 @@
+default: &default
+  adapter: postgresql
+  encoding: utf8
+  # pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: <%= ENV.fetch('DB_HOST', '127.0.0.1') %>
+  # database: <%= ENV['DB_NAME'] %>
+  username: username
+  password: password
+
+development:
+  <<: *default
+  database: spatial_api_dev
+
+test:
+  <<: *default
+  database: spatial_api_test
+
+production:
+  <<: *default
+  database: spatial_api_production
