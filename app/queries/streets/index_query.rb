@@ -37,7 +37,7 @@ module Streets
     end
 
     def order
-      @params[:order].downcase
+      @params[:order]&.downcase
     end
   end
 end

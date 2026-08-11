@@ -1,24 +1,120 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
+* Stack:
+Ruby: 3.47
+Rails: 8.1.3.1
+PostgreSQL: 18.2
 
 * System dependencies
 
 * Configuration
 
 * Database creation
+For local development I'm using PostgreSQL with PostGIS extension installed (https://github.com/postgis/docker-postgis) in a docker container. Container is configured via `docker-compose.yml` file and can be started using Foreman/Overmind along with the rails server, or with:
+```
+$ docker compose up db
+```
 
 * Database initialization
 
-* How to run the test suite
+I'm using OpenStreetMap data exported as OSM file and then imported to PostgreSQL using `osm2pgsql` utility (https://osm2pgsql.org/).
 
-* Services (job queues, cache servers, search engines, etc.)
+```
+osm2pgsql -d spatial_api_dev -U gis -H localhost -P 5433 -W -c map.osm
 
-* Deployment instructions
+```
 
-* ...
+where `spatial_api_dev` is the database and `map.osm` is the file with exported OSM data.
+
+# Endpoints
+
+There are couple of endpoint in the application, ie.:
+
+## Street names
+```
+/api/v1/streets              # default order asc
+/api/v1/streets?order=desc   # order: asc|desc
+```
+
+which returns GeoJSON response with all street names.
+
+```
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Chemiczna"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Działkowa"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Elektronowa"
+      }
+    },
+    ...
+  ]
+}
+```
+
+## Places
+
+### Index
+
+```
+/api/v1/places
+/api/v1/places?json=simple      # simple formatting instead of GeoJSON
+/api/v1/places?order=asc|desc   # sort
+```
+
+This endpoint returns either simple array:
+```
+[
+"bench",
+"nightclub",
+"waste_basket",
+...
+"grit_bin",
+"atm",
+...
+"shop/bakery",
+...
+"leisure/fitness_centre",
+...
+"tourism/information",
+...
+"man_made/utility_pole"
+]
+```
+
+or proper GeoJSON:
+```
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "text": "bench"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "text": "nightclub"
+      }
+    },
+...
+  ]
+}
+```
+
+Names from this endpoint can be used in other endpoints.
