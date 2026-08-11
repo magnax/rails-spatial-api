@@ -1,5 +1,5 @@
 default: &default
-  adapter: postgresql
+  adapter: postgis
   encoding: utf8
   host: <%= ENV.fetch('DB_HOST', '127.0.0.1') %>
   port: <%= ENV.fetch('DB_PORT', '5432') %>

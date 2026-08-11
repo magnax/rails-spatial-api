@@ -24,7 +24,7 @@ module Places
     end
     
     def results
-      @all_features ||= map_features(all_features)
+      @results ||= map_features(all_features)
     end
 
     def all_features
@@ -48,7 +48,7 @@ module Places
           type: 'Feature',
           geometry: {
             type: 'Point',
-            coordinates: [obj.lon, obj.lat]
+            coordinates: [obj[:lon], obj[:lat]]
           },
           properties: {
             place_type: place_type,
