@@ -8,7 +8,7 @@ module Places
 
     def call
       return Formatters::ErrorResponseJson.render if invalid_params?
-      return Formatters::SimpleJson.render(results) if simple_format?
+      return Formatters::SimpleJson.render(results, render_type: 'objects') if simple_format?
 
       Formatters::FeatureCollection.render(results)
     end
@@ -22,20 +22,21 @@ module Places
     def simple_format?
       @params[:json]&.downcase == 'simple'
     end
-
+    
     def results
-      return all_features unless order
-
-      all_features.sort_by do |obj|
-        obj[:properties][:text]
-      end
+      @all_features ||= map_features(all_features)
     end
 
     def all_features
-      @all_features ||= map_features(feature_type)
+      q = query_by_type
+
+      q = radius_query(q) if radius_query?
+      q = q.order(name: direction) if order.present?
+      
+      q.select(fields)
     end
 
-    def feature_type
+    def query_by_type
       return amenities if @params[:amenity].present?
 
       points_by_type
@@ -58,15 +59,11 @@ module Places
     end
     
     def amenities
-      q = Point.where(amenity: amenity)
-      q = radius_query(q) if radius_query?
-
-      q.select(fields)
+      Point.where(amenity: amenity)
     end
     
     def points_by_type
       Point.where("#{place_type} = ?", @params[:place_name])
-           .select(fields)
     end
     
     def fields

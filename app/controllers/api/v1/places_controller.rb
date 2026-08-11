@@ -16,6 +16,6 @@ class Api::V1::PlacesController < ApiController
   end
 
   def search_params
-    params.permit(:amenity, :place_name, :place_type, :r, :radius, :loc)
+    params.permit(:amenity, :json, :loc, :order, :place_name, :place_type, :r, :radius)
   end
 end
