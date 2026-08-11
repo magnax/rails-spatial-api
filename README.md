@@ -118,3 +118,47 @@ or proper GeoJSON:
 ```
 
 Names from this endpoint can be used in other endpoints.
+
+### Places/search
+
+```
+/api/v1/places/[amenity] ie. /api/places/nightclub
+/api/v1/places/[place_type]/[place_name] ie. /api/places/shop/bakery
+# can be called with singular or plural place type, ie.
+/api/v1/places/[place_type]/[place_name] ie. /api/places/shops/bakery
+```
+
+These endpoints returns list of all places with given type:
+```
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.498695599999998,
+          51.944443199122375
+        ]
+      },
+      "properties": {
+        "place_type": "amenity",
+        "name": "Hot Shots"
+      }
+    }
+  ]
+}
+```
+
+```
+/api/v1/places/bench?loc=[lon],[lat]&r=500   # radius in meters
+/api/v1/places/bench?loc=[lon],[lat]&r=500m  # radius in meters
+/api/v1/places/bench?loc=[lon],[lat]&r=2k    # radius in kilometers
+/api/v1/places/bench?loc=[lon],[lat]&r=2km   # radius in kilometers
+/api/v1/places/bench?loc=15.49,51.94&r=500 
+```
+
+Searching for given place type in given radius from location.
+
+*_All search endpoints accept `order` and `json` params for sorting and showing results in simpler format._*
