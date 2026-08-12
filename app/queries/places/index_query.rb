@@ -21,9 +21,12 @@ module Places
     def all_names
       return all_features unless order
 
-      all_features.sort_by do |obj|
+      result = all_features.sort_by do |obj|
         obj[:properties][:text]
       end
+
+      result = result.reverse if order == 'desc'
+      result
     end
 
     def all_features
