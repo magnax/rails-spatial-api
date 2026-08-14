@@ -30,34 +30,30 @@ module Places
     end
 
     def all_features
-      @all_features ||= map_features(
-        amenities + 
-        point_by_type('shop') + 
-        point_by_type('leisure') + 
-        point_by_type('tourism') + 
-        point_by_type('man_made')
-      )
+      @all_features ||= map_features(features).uniq
     end
-
+      
     def map_features(objects)
       objects.map do |obj|
         {
           type: 'Feature',
           properties: {
-            text: obj
+            text: obj.place_type == 'amenity' ? obj.place_name : "#{obj.place_type}/#{obj.place_name}"
           }
         }
       end
     end
 
-    def amenities
-      Point.pluck(:amenity).uniq.compact
-    end
-
-    def point_by_type(point_type)
-      Point.pluck(point_type.to_sym).uniq.compact.map do |name|
-        "#{point_type}/#{name}"
-      end
+    def features
+      Point.where('COALESCE(amenity, leisure, man_made, shop, tourism) IS NOT NULL')
+           .select('CASE WHEN amenity is not null THEN \'amenity\''\
+                        'WHEN leisure is not null THEN \'leisure\''\
+                        'WHEN man_made is not null THEN \'man_made\''\
+                        'WHEN shop is not null THEN \'shop\''\
+                        'WHEN tourism is not null THEN \'tourism\''\
+                        'ELSE NULL '\
+                   'END as place_type, '\
+                   'COALESCE(amenity, leisure, man_made, shop, tourism) as place_name, name')
     end
 
     def direction

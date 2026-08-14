@@ -34,4 +34,25 @@ class PlacesIndexQueryTest < ActiveSupport::TestCase
     assert_equal 'parking', res[:features].first[:properties][:text]
     assert_equal 'bench', res[:features].last[:properties][:text]
   end
+
+  test 'different types of places' do
+    create(:point, amenity: 'bench')
+    create(:point, amenity: 'bench')
+    create(:point, amenity: 'parking')
+    create(:point, shop: 'chemist', name: 'Rossman')
+    create(:point, shop: 'chemist', name: 'Hebe')
+    create(:point, leisure: 'bowling_alley', name: 'Bowling Club')
+    create(:point, tourism: 'hotel', name: 'Grand Hotel')
+    create(:point, man_made: 'mast')
+
+    params = {
+      order: 'asc'
+    }
+
+    res = call_service(params)
+
+    assert_equal 6, res[:features].length
+    assert_equal 'bench', res[:features].first[:properties][:text]
+    assert_equal 'tourism/hotel', res[:features].last[:properties][:text]
+  end
 end
